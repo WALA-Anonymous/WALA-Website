@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="WALA is a framework for learning executable latent actions from action-labeled demonstrations and action-free videos."
+    />
+    <title>WALA | Learning Executable Latent Actions</title>
+    <link rel="preload" as="image" href="assets/images/wala_new.webp?v=figure-20260925" fetchpriority="high" />
+    <link rel="stylesheet" href="styles.css?v=fast-20260923" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Site header">
+      <a class="brand" href="#top" aria-label="WALA home">
+        <span class="brand-mark">W</span>
+        <span>WALA</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#overview">Overview</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#videos">Videos</a>
+        <a href="#resources">Resources</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-bg" aria-hidden="true">
+          <img src="assets/images/wala_new.webp?v=figure-20260925" width="2400" height="1350" alt="" fetchpriority="high" />
+        </div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="eyebrow">
+            <span class="acronym-letter">W</span>orld- and
+            <span class="acronym-letter">A</span>ction-supervised
+            <span class="acronym-letter">L</span>atent
+            <span class="acronym-letter">A</span>ctions
+          </p>
+          <h1 id="hero-title">WALA</h1>
+          <p class="hero-subtitle">
+            Learning Executable Latent Actions from Action-Labeled
+            Demonstrations and Action-Free Videos
+          </p>
+          <div class="author-block" aria-label="Authors and affiliations">
+            <p class="authors">Anonymous Authors</p>
+          </div>
+          <div class="hero-icons" aria-label="Project links">
+            <a
+              class="icon-link"
+              href="https://anonymous.4open.science/r/WALA-0178/"
+              target="_blank"
+              rel="noopener"
+              aria-label="GitHub code"
+              title="GitHub code"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.7a9.5 9.5 0 0 0-3 18.5c.47.08.64-.2.64-.46v-1.62c-2.6.56-3.15-1.12-3.15-1.12-.43-1.08-1.05-1.37-1.05-1.37-.86-.58.06-.57.06-.57.95.07 1.45.98 1.45.98.84 1.45 2.22 1.03 2.76.79.09-.62.33-1.03.6-1.27-2.08-.24-4.27-1.04-4.27-4.62 0-1.02.36-1.85.97-2.5-.1-.24-.42-1.2.09-2.47 0 0 .79-.25 2.6.96A8.9 8.9 0 0 1 12 6.64c.8 0 1.6.1 2.35.31 1.8-1.21 2.59-.96 2.59-.96.51 1.27.19 2.23.09 2.47.61.65.97 1.48.97 2.5 0 3.59-2.2 4.38-4.29 4.61.34.29.64.86.64 1.74v2.58c0 .25.17.55.65.46A9.5 9.5 0 0 0 12 2.7Z" />
+              </svg>
+              <span>GitHub Code</span>
+            </a>
+            <a
+              class="icon-link"
+              href="https://anonymous-hf.com/a/7ca6cwsa5pt6/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Anonymous model weights"
+              title="Anonymous model weights"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 3h2v9.17l3.59-3.58L18 10l-6 6-6-6 1.41-1.41L11 12.17V3ZM5 17v3h14v-3h2v5H3v-5h2Z" />
+              </svg>
+              <span>Model Weights</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="overview" class="section overview-section">
+        <div class="section-inner abstract-full">
+          <p class="section-kicker">Abstract</p>
+          <div class="overview-text">
+            <p>
+              Human videos provide rich information about object manipulation at a scale
+              difficult to reproduce with robots, but often lack action annotations that
+              can directly supervise robot policies. Realizing this potential requires
+              distinguishing interaction-relevant changes from static appearance and
+              connecting the learned interaction knowledge to executable robot actions.
+            </p>
+            <p>
+              We present <strong>WALA</strong>, a framework named for
+              <em>World- and Action-supervised Latent Actions</em>.
+              Its semantic-geometric latent action model (LAM) learns latent actions
+              by encoding and predicting semantic and geometric changes,
+              emphasizing interactions over static appearance while retaining spatial detail.
+            </p>
+            <p>
+              During robot policy training, the LAM encoder and decoder provide
+              guidance through distillation and visual prediction, respectively.
+              Together with robot action supervision, these signals shape
+              policy-generated latent actions to support world prediction and
+              capture the information needed to directly generate executable robot actions.
+              Because LAM supervision requires no action labels, WALA enables
+              co-training on action-labeled robot demonstrations and task-relevant
+              action-free videos.
+            </p>
+            <p>
+              In simulation experiments, our method achieves <strong>92.33%</strong>
+              average success on RoboTwin and <strong>75.2%</strong> on
+              RoboCasa-GR1-Tabletop, exceeding the previous state of the art
+              on RoboCasa by <strong>5.0</strong> percentage points.
+              WALA also shows strong real-robot performance, further enhanced
+              by task-relevant action-free human videos that improve data
+              efficiency and support target-task zero-shot and few-shot transfer.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="method" class="section method-section">
+        <div class="section-inner">
+          <p class="section-kicker">Method</p>
+          <div class="figure-grid">
+            <figure class="figure-panel overview-figure">
+              <a class="overview-image" href="assets/images/wala_new.pdf?v=figure-20260925" target="_blank" rel="noopener">
+                <img src="assets/images/wala_new.webp?v=figure-20260925" width="2400" height="1350" decoding="async" alt="Two-stage WALA framework with the inference pathway outlined" />
+              </a>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="section results-section">
+        <div class="section-inner">
+          <p class="section-kicker">Experiments</p>
+          <div class="tables-stack">
+            <article class="table-card">
+              <div class="table-heading">
+                <span class="result-tag">RoboTwin 2.0</span>
+                <h3>Main results on RoboTwin</h3>
+              </div>
+              <div class="table-wrap">
+                <table class="paper-table">
+                  <thead>
+                    <tr>
+                      <th>Group</th>
+                      <th>Method</th>
+                      <th>Clean</th>
+                      <th>Random</th>
+                      <th>Avg.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="group-cell" rowspan="4">VLA-based</td>
+                      <td>π<sub>0.5</sub></td>
+                      <td>82.74</td>
+                      <td>76.76</td>
+                      <td>79.75</td>
+                    </tr>
+                    <tr>
+                      <td>X-VLA</td>
+                      <td>72.80</td>
+                      <td>72.84</td>
+                      <td>72.82</td>
+                    </tr>
+                    <tr>
+                      <td>StarVLA-α</td>
+                      <td>88.20</td>
+                      <td>88.30</td>
+                      <td>88.25</td>
+                    </tr>
+                    <tr>
+                      <td>InternVLA-A1</td>
+                      <td>89.40</td>
+                      <td>89.64</td>
+                      <td>89.52</td>
+                    </tr>
+                    <tr class="section-break">
+                      <td class="group-cell" rowspan="3">WAM-based</td>
+                      <td>Motus</td>
+                      <td>88.66</td>
+                      <td>87.02</td>
+                      <td>87.84</td>
+                    </tr>
+                    <tr>
+                      <td>Fast-WAM</td>
+                      <td>91.88</td>
+                      <td>91.78</td>
+                      <td>91.83</td>
+                    </tr>
+                    <tr>
+                      <td>LingBot-VA</td>
+                      <td><span class="best">92.93</span></td>
+                      <td>91.55</td>
+                      <td><span class="second">92.24</span></td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td class="group-cell" rowspan="2">Ours</td>
+                      <td>WALA</td>
+                      <td class="plain-score">90.62</td>
+                      <td><span class="best">92.80</span></td>
+                      <td>91.71</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>WALA-Wan</td>
+                      <td><span class="second">92.36</span></td>
+                      <td><span class="second">92.30</span></td>
+                      <td><span class="best">92.33</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="table-card">
+              <div class="table-heading">
+                <span class="result-tag">RoboCasa-GR1-Tabletop</span>
+                <h3>Main results on RoboCasa</h3>
+              </div>
+              <div class="table-wrap compact">
+                <table class="paper-table">
+                  <thead>
+                    <tr>
+                      <th>Group</th>
+                      <th>Method</th>
+                      <th>Avg.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="group-cell" rowspan="8">VLA-based</td>
+                      <td>StarVLA Qwen3-PI</td>
+                      <td>43.9</td>
+                    </tr>
+                    <tr>
+                      <td>GR00T-N1.6</td>
+                      <td>47.6</td>
+                    </tr>
+                    <tr>
+                      <td>StarVLA Qwen3-GR00T</td>
+                      <td>47.8</td>
+                    </tr>
+                    <tr>
+                      <td>StarVLA Qwen3-OFT</td>
+                      <td>48.8</td>
+                    </tr>
+                    <tr>
+                      <td>StarVLA-α</td>
+                      <td>57.3</td>
+                    </tr>
+                    <tr>
+                      <td>ABoT-M0</td>
+                      <td>58.3</td>
+                    </tr>
+                    <tr>
+                      <td>RLDX-1</td>
+                      <td>58.7</td>
+                    </tr>
+                    <tr>
+                      <td>FrameSkip</td>
+                      <td>59.5</td>
+                    </tr>
+                    <tr class="section-break">
+                      <td class="group-cell" rowspan="3">WAM-based</td>
+                      <td>DiT4DiT</td>
+                      <td>50.8</td>
+                    </tr>
+                    <tr>
+                      <td>LDA-1B</td>
+                      <td>55.4</td>
+                    </tr>
+                    <tr>
+                      <td>DIAL</td>
+                      <td><span class="second">70.2</span></td>
+                    </tr>
+                    <tr class="section-break">
+                      <td class="group-cell" rowspan="3">LAM-based</td>
+                      <td>Moto<sup title="Our reproduction" aria-label="Our reproduction">&dagger;</sup></td>
+                      <td>45.6</td>
+                    </tr>
+                    <tr>
+                      <td>UniVLA<sup title="Our reproduction" aria-label="Our reproduction">&dagger;</sup></td>
+                      <td>51.2</td>
+                    </tr>
+                    <tr>
+                      <td>VLA-UniT</td>
+                      <td>66.7</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td class="group-cell">Ours</td>
+                      <td>WALA</td>
+                      <td><span class="best">75.2</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="table-card wide">
+              <div class="table-heading">
+                <span class="result-tag">Ablation</span>
+                <h3>Ablation study on RoboCasa-GR1-Tabletop</h3>
+              </div>
+              <div class="table-wrap">
+                <table class="paper-table ablation-table">
+                  <colgroup>
+                    <col class="ablation-variant-col" />
+                    <col class="ablation-supervision-col" span="4" />
+                    <col class="ablation-score-col" span="2" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="empty-head"></th>
+                      <th colspan="4">Supervision</th>
+                      <th class="empty-head"></th>
+                      <th class="empty-head"></th>
+                    </tr>
+                    <tr>
+                      <th>Variant</th>
+                      <th><span class="stacked-head">LAM<br />Pretraining</span></th>
+                      <th><span class="stacked-head">Latent<br />Distillation</span></th>
+                      <th><span class="stacked-head">Semantic<br />Feature Pred.</span></th>
+                      <th><span class="stacked-head">Depth-Map<br />Prediction</span></th>
+                      <th>Avg.</th>
+                      <th>Gain</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Base Policy</td>
+                      <td class="dash">--</td>
+                      <td class="dash">--</td>
+                      <td class="dash">--</td>
+                      <td class="dash">--</td>
+                      <td>54.2</td>
+                      <td>--</td>
+                    </tr>
+                    <tr>
+                      <td>+ World Model without Pretraining</td>
+                      <td class="dash">--</td>
+                      <td class="dash">--</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td>67.8</td>
+                      <td>+13.6</td>
+                    </tr>
+                    <tr>
+                      <td>+ Semantic-Feature Prediction</td>
+                      <td class="check">✓</td>
+                      <td class="dash">--</td>
+                      <td class="check">✓</td>
+                      <td class="dash">--</td>
+                      <td>68.8</td>
+                      <td>+14.6</td>
+                    </tr>
+                    <tr>
+                      <td>+ Semantic-Geometric World Model</td>
+                      <td class="check">✓</td>
+                      <td class="dash">--</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td>71.0</td>
+                      <td>+16.8</td>
+                    </tr>
+                    <tr>
+                      <td>+ Latent-Action Distillation</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td class="dash">--</td>
+                      <td class="dash">--</td>
+                      <td>67.6</td>
+                      <td>+13.4</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>WALA</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td class="check">✓</td>
+                      <td><span class="best">75.2</span></td>
+                      <td><span class="best">+21.0</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="table-card wide chart-card">
+              <div class="table-heading">
+                <span class="result-tag">Data Scaling</span>
+                <h3>Data scaling on RoboCasa</h3>
+              </div>
+              <div class="chart-wrap">
+                <div class="chart-split" aria-label="Separate robot-demonstration and action-free-video scaling studies">
+                  <figure class="study-figure">
+                    <a href="assets/images/robocasa_labeled_scaling.pdf?v=paper-20260923" target="_blank" rel="noopener">
+                      <img class="chart-image" src="assets/images/robocasa_labeled_scaling.webp?v=fast-20260923" width="1600" height="1156" loading="eager" decoding="async" alt="Matched robot-data scaling: WALA reaches 53.9, 66.5, 71.2, and 75.2 percent at 10, 40, 70, and 100 percent of the demonstrations." />
+                    </a>
+                  </figure>
+                  <figure class="study-figure">
+                    <a href="assets/images/robocasa_action_free_scaling.pdf?v=paper-20260923" target="_blank" rel="noopener">
+                      <img class="chart-image" src="assets/images/robocasa_action_free_scaling.webp?v=fast-20260923" width="1600" height="1156" loading="eager" decoding="async" alt="With 10 percent labeled robot data fixed, adding 0, 30, 60, and 90 percent action-free robot videos raises success from 53.9 to 62.3, 65.7, and 67.8 percent." />
+                    </a>
+                  </figure>
+                </div>
+              </div>
+            </article>
+
+            <article class="table-card wide real-robot-card">
+              <div class="table-heading">
+                <span class="result-tag">Real Robot</span>
+                <h3>Real-robot experiments</h3>
+              </div>
+              <div class="table-wrap">
+                <table class="paper-table real-robot-table">
+                  <thead>
+                    <tr>
+                      <th>Group</th>
+                      <th>Method</th>
+                      <th>Robot demos / task</th>
+                      <th>Human videos / task</th>
+                      <th>Basic Pick-Place</th>
+                      <th>Stack Paper Cups</th>
+                      <th>Insert Flowers</th>
+                      <th>Disassemble Blocks</th>
+                      <th>Avg.</th>
+                      <th>Latency</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="group-cell" rowspan="2">Baselines</td>
+                      <td>π<sub>0</sub></td>
+                      <td>200</td>
+                      <td>0</td>
+                      <td>25/30</td>
+                      <td>15/30</td>
+                      <td>12/30</td>
+                      <td>10/30</td>
+                      <td>51.7</td>
+                      <td>170 ms</td>
+                    </tr>
+                    <tr>
+                      <td>π<sub>0.5</sub></td>
+                      <td>200</td>
+                      <td>0</td>
+                      <td>26/30</td>
+                      <td>15/30</td>
+                      <td>16/30</td>
+                      <td>13/30</td>
+                      <td>58.3</td>
+                      <td>190 ms</td>
+                    </tr>
+                    <tr class="section-break">
+                      <td class="group-cell" rowspan="3">Ours<br />50 demos</td>
+                      <td>WALA</td>
+                      <td>50</td>
+                      <td>0</td>
+                      <td>26/30</td>
+                      <td>18/30</td>
+                      <td>17/30</td>
+                      <td>15/30</td>
+                      <td>63.3</td>
+                      <td>70 ms</td>
+                    </tr>
+                    <tr>
+                      <td>WALA</td>
+                      <td>50</td>
+                      <td>150</td>
+                      <td>28/30</td>
+                      <td>21/30</td>
+                      <td>18/30</td>
+                      <td>17/30</td>
+                      <td>70.0</td>
+                      <td>70 ms</td>
+                    </tr>
+                    <tr>
+                      <td>WALA</td>
+                      <td>50</td>
+                      <td>400</td>
+                      <td>30/30</td>
+                      <td>23/30</td>
+                      <td>19/30</td>
+                      <td>17/30</td>
+                      <td>74.2</td>
+                      <td>70 ms</td>
+                    </tr>
+                    <tr class="section-break">
+                      <td class="group-cell" rowspan="2">Ours<br />200 demos</td>
+                      <td>WALA</td>
+                      <td>200</td>
+                      <td>0</td>
+                      <td>28/30</td>
+                      <td>21/30</td>
+                      <td>21/30</td>
+                      <td>20/30</td>
+                      <td>75.0</td>
+                      <td>70 ms</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>WALA</td>
+                      <td>200</td>
+                      <td>400</td>
+                      <td><span class="best">30/30</span></td>
+                      <td><span class="best">25/30</span></td>
+                      <td><span class="best">24/30</span></td>
+                      <td><span class="best">21/30</span></td>
+                      <td><span class="best">83.3</span></td>
+                      <td>70 ms</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="videos" class="section videos-section">
+        <div class="section-inner">
+          <div class="video-section-heading">
+            <p class="section-kicker">Real-World Policy Rollouts</p>
+            <h2>Method Comparison</h2>
+          </div>
+
+          <div class="real-video-comparison" aria-label="Real-world policy rollout comparison">
+            <div class="comparison-header" aria-hidden="true">
+              <span>Task</span>
+              <span class="math-label">&pi;<sub>0.5</sub></span>
+              <span>WALA</span>
+            </div>
+
+            <article class="comparison-row">
+              <h3>Basic Pick-Place</h3>
+              <figure class="comparison-video" data-policy="&pi;0.5">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/openpi_putao.mp4" aria-label="Pi 0.5 rollout for Basic Pick-Place"></video>
+              </figure>
+              <figure class="comparison-video wala-comparison-video" data-policy="WALA">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/putao.mp4" aria-label="WALA rollout for Basic Pick-Place"></video>
+              </figure>
+            </article>
+
+            <article class="comparison-row">
+              <h3>Stack Paper Cups</h3>
+              <figure class="comparison-video" data-policy="&pi;0.5">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/openpi_zhibei.mp4" aria-label="Pi 0.5 rollout for Stack Paper Cups"></video>
+              </figure>
+              <figure class="comparison-video wala-comparison-video" data-policy="WALA">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/zhibei.mp4" aria-label="WALA rollout for Stack Paper Cups"></video>
+              </figure>
+            </article>
+
+            <article class="comparison-row">
+              <h3>Insert Flowers</h3>
+              <figure class="comparison-video" data-policy="&pi;0.5">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/openpi_chahua.mp4" aria-label="Pi 0.5 rollout for Insert Flowers"></video>
+              </figure>
+              <figure class="comparison-video wala-comparison-video" data-policy="WALA">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/chahua.mp4" aria-label="WALA rollout for Insert Flowers"></video>
+              </figure>
+            </article>
+
+            <article class="comparison-row">
+              <h3>Disassemble Blocks</h3>
+              <figure class="comparison-video" data-policy="&pi;0.5">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/openpi_jimu.mp4" aria-label="Pi 0.5 rollout for Disassemble Blocks"></video>
+              </figure>
+              <figure class="comparison-video wala-comparison-video" data-policy="WALA">
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/jimu.mp4" aria-label="WALA rollout for Disassemble Blocks"></video>
+              </figure>
+            </article>
+          </div>
+
+          <div id="human-video-transfer" class="transfer-showcase">
+            <div class="transfer-heading">
+              <p class="section-kicker">Human-Video Transfer</p>
+              <h2>Target-task zero-shot and few-shot transfer</h2>
+            </div>
+
+            <div class="transfer-video-grid">
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label">Zero-Shot</span>
+                  <h3>Bread Pick-Place</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/mianbao.mp4" aria-label="WALA zero-shot rollout for picking up bread and placing it on a plate"></video>
+                <p class="transfer-score"><span>0 target videos<strong>9/30</strong></span><span>150 target videos<strong>24/30</strong></span></p>
+              </article>
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label">Zero-Shot</span>
+                  <h3>Open Wooden Cabinet Door</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/open_cabinet_door.mp4?v=848x480-20260923" aria-label="WALA zero-shot rollout for opening a wooden cabinet door"></video>
+                <p class="transfer-score"><span>0 target videos<strong>4/30</strong></span><span>150 target videos<strong>15/30</strong></span></p>
+              </article>
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label">Zero-Shot</span>
+                  <h3>Place Two Apples on Plate</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/pick_two_apple.mp4?v=848x480-20260923" aria-label="WALA zero-shot rollout for sequentially placing two apples on a plate"></video>
+                <p class="transfer-score"><span>0 target videos<strong>0/30</strong></span><span>150 target videos<strong>8/30</strong></span></p>
+              </article>
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label few-shot-label">Few-Shot</span>
+                  <h3>Turn On Lamp</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/deng.mp4" aria-label="WALA few-shot rollout for turning on a lamp"></video>
+                <p class="transfer-score"><span>0 target videos<strong>13/30</strong></span><span>150 target videos<strong>22/30</strong></span></p>
+              </article>
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label few-shot-label">Few-Shot</span>
+                  <h3>Open Shelf-Unit Door</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/open_door.mp4" aria-label="WALA few-shot rollout for opening a shelf-unit door"></video>
+                <p class="transfer-score"><span>0 target videos<strong>8/30</strong></span><span>150 target videos<strong>19/30</strong></span></p>
+              </article>
+              <article class="transfer-video-card">
+                <div class="transfer-card-copy">
+                  <span class="transfer-label few-shot-label">Few-Shot</span>
+                  <h3>Pen Pick-Place + Door Closing</h3>
+                </div>
+                <video controls muted playsinline preload="none" src="assets/videos/real_world/pick_place_pen_close_door.mp4" aria-label="WALA few-shot rollout for picking and placing a pen and closing the door"></video>
+                <p class="transfer-score"><span>0 target videos<strong>6/30</strong></span><span>150 target videos<strong>18/30</strong></span></p>
+              </article>
+            </div>
+          </div>
+
+          <div class="video-subsection">
+            <p class="section-kicker">RoboCasa Simulation Rollout Videos</p>
+            <div class="robocasa-video-grid">
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_01.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_02.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_03.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_04.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_05.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_06.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_07.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_08.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_09.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_10.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_11.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_12.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_13.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_14.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_15.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_16.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_17.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_18.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_19.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_20.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_21.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_22.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_23.mp4"></video></article>
+            <article class="video-tile"><video controls muted playsinline preload="none" src="assets/videos/robocasa/rollout_24.mp4"></video></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="resources" class="section resources-section">
+        <div class="section-inner resource-band">
+          <div>
+            <p class="section-kicker">Resources</p>
+          <h2>Code &amp; Model Weights</h2>
+          </div>
+          <div class="resource-actions">
+            <a class="button" href="https://anonymous.4open.science/r/WALA-0178/" target="_blank" rel="noopener">GitHub Code</a>
+            <a class="button" href="https://anonymous-hf.com/a/7ca6cwsa5pt6/" target="_blank" rel="noopener noreferrer">Model Weights</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>WALA</span>
+      <span>Learning Executable Latent Actions from Action-Labeled Demonstrations and Action-Free Videos</span>
+    </footer>
+    <script type="module" src="assets/js/media-loader.mjs?v=fast-20260923"></script>
+  </body>
+</html>
